@@ -3,10 +3,10 @@
 # @Author: LostInNight
 # @Date:   2015-11-02 10:56:58
 # @Last Modified by:   LostInNight
-# @Last Modified time: 2015-11-05 21:28:43
+# @Last Modified time: 2015-11-19 15:20:12
 
 
-# 公司后台报价审核的脚本
+# 生意社报价审核的脚本
 import requests
 import os
 import datetime
@@ -18,33 +18,31 @@ import time
 
 class Client(object):
 
-    """自动审核生意社报价
+    """自动审核XXXXXXXXXXX报价
 
-    1. 保密起见，将本代码中所有一级域名全换成xxx.xxx.xxx，自己使用时须改回去！
-    2. 配置文件的格式如下，文件名由变量CONFIG_FILE指定：
+    需要在同目录下有配置文件，格式：
 
-    ; 后台账号，需要有审核报价权限
+
     [user]
-    username = xxxxx
-    password = xxxxx
+    username = XXXXXXXXX
+    password = XXXXXXXXXXXXXX
 
-
-    ; 需要审核通过的账号
     [price_accounts]
-    xxxx1 = xx公司
-    xxxx2 = xx公司
-    xxxx3 = xx公司
-
+    XXXXXXXXX = XXXXXXXXX
+    XXXXXXXXX = XXXXXXXXX
+    XXXXXXXXX = XXXXXXXXX
+    XXXXXXXXX = XXXXXXXXX
+    XXXXXXXXX = XXXXXXXXX
     """
 
-    CONFIG_FILE = "ppi_price.ini"  # 配置文件
-    LOGIN_URL = r'http://xxx.xxx.xxx/member/index.php?f=login_form'
-    PRICE_URL = r'http://xxx.xxx.xxx/member/edit.php?poster={0}&f=list_price&terms=&asid=&pid=&p=1&cate=&ptype=&status=0&submit1=%E6%90%9C%E7%B4%A2'
-    ACTIVATE_URL = r'http://xxx.xxx.xxx/member/edit.php'
+    CONFIG_FILE = "XXXXXXXXXX.ini"  # 配置文件
+    LOGIN_URL = r'http://XXXXXXXXXXXXXXXogin_form'
+    PRICE_URL = r'http://XXXXXXXXXXXXXXXXXXXXX'
+    ACTIVATE_URL = r'http://XXXXXXXXXXXXXXX'
     HEADERS = {
-        'Accept-Encoding':'gzip, deflate',
-        'Host': 'xxx.xxx.xxx',
-        'Origin':'http://xxx.xxx.xxx',
+        'Accept-Encoding': 'gzip, deflate',
+        'Host': 'XXXXXXXXXX.com',
+        'Origin': 'http://XXXXXXXXXXXX.com',
         'User-Agent': 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36'
     }
     DEBUG = True  # 开关调试信息
@@ -54,17 +52,16 @@ class Client(object):
         self.session = requests.Session()
         self._read_config_file()
 
-
     def start(self):
         self._login()
         while True:
             for account in self.accounts:
                 self._check_inactive_price(account)
-            time.sleep(30)
+            time.sleep(60)
 
     def _read_config_file(self):
         config = configparser.ConfigParser()
-        config.read(Client.CONFIG_FILE, encoding = "utf-8")
+        config.read(Client.CONFIG_FILE, encoding="utf-8")
         self.username = config.get("user", "username")
         self.password = config.get("user", "password")
         self.accounts = config.options("price_accounts")
@@ -75,7 +72,8 @@ class Client(object):
             now = str(datetime.datetime.now())
             index = now.rfind(":")
             now = now[:index + 3]
-            print("-"*50)
+            message = message.encode("gbk", errors="ignore").decode("gbk")
+            print("-" * 50)
             print("%s" % now)
             print(message + "\n")
 
@@ -86,9 +84,10 @@ class Client(object):
             'password': self.password,
             'f1': ''
         }
-        html = self.session.post(Client.LOGIN_URL, data=data, headers=Client.HEADERS)
-        # 失败则返回网址'....f=login_form&error=1'
-        # 成功则返回网址'....f=welcome'
+        html = self.session.post(
+            Client.LOGIN_URL, data=data, headers=Client.HEADERS)
+        # 失败则返回网址'http://XXXXXXXXXXXXXndex.php?f=login_form&error=1'
+        # 成功则返回网址'http://XXXXXXXXXXXXXXndex.php?f=welcome'
         assert 'welcome' in html.url, "登录错误！请检查账号"
         self._log('登录 %s 成功！' % self.username)
 
@@ -97,34 +96,33 @@ class Client(object):
 
     def _activate_price(self, price_id):
         post_data = {
-            'f':'change_price_status',
-            "welcome":"no",
-            "id":price_id
+            'f': 'change_price_status',
+            "welcome": "no",
+            "id": price_id
         }
-        self.session.post(Client.ACTIVATE_URL, data = post_data)
+        self.session.post(Client.ACTIVATE_URL, data=post_data)
 
     def _check_inactive_price(self, account):
         html = self._open_url(Client.PRICE_URL.format(account))
         soup = BS(html, "lxml")
         table = soup.table
-        trs = table.find_all("tr") # 所有<tr>标签
-        data_trs = trs[1:-1] # 首尾两行没报价数据
-        for index,tr in enumerate(data_trs):
+        trs = table.find_all("tr")  # 所有<tr>标签
+        data_trs = trs[1:-1]  # 首尾两行没报价数据
+        for index, tr in enumerate(data_trs):
             tds = tr.find_all("td")
             if index % 2 == 0:
-                goods = tds[0].string # 商品名称
-                price_type = tds[1].string # 报价类型
-                price = tds[3].string # 现货价格
-                date = tds[4].string # 报价日期
-                price_id = tds[5].a["rel"][0] # 用于激活
+                goods = tds[0].string  # 商品名称
+                price_type = tds[1].string  # 报价类型
+                price = tds[3].string  # 现货价格
+                date = tds[4].string  # 报价日期
+                price_id = tds[5].a["rel"][0]  # 用于激活
             else:
-                attrs = tds[1].string # 属性与规格
-                attrs = ["", attrs][attrs != None] # None则显示空白
-                self._log("检测到账号 %s 的新报价：\n" % account + " ".join([ goods, price_type, price, date, attrs]))
+                attrs = tds[1].string  # 属性与规格
+                attrs = ["", attrs][attrs != None]  # None则显示空白
+                self._log("检测到账号 %s 的新报价：\n" % account +
+                          " ".join([goods, price_type, price, date, attrs]))
                 self._activate_price(price_id)
                 self._log("已激活上述报价！")
-
-
 
 
 if __name__ == '__main__':

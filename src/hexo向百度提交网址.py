@@ -3,7 +3,7 @@
 # @Author: LoveNight
 # @Date:   2015-11-16 20:45:59
 # @Last Modified by:   LoveNight
-# @Last Modified time: 2015-11-18 18:39:16
+# @Last Modified time: 2015-11-19 15:28:50
 import os
 import sys
 import json
@@ -15,13 +15,13 @@ import msvcrt
 hexo 博客专用，向百度站长平台提交所有网址
 
 本脚本必须放在hexo博客的根目录下执行！需要已安装生成百度站点地图的插件。
-百度站长平台提交链接：http://zhanzhang.baidu.com/linksubmit/index
+百度站长平台提交链接：http://zhanzhang.baidu.com/linksubmit/index 从中找到自己的接口调用地址
 主动推送：最为快速的提交方式，推荐您将站点当天新产出链接立即通过此方式推送给百度，以保证新链接可以及时被百度收录。
-从中找到自己的接口调用地址
+
 """
 
 
-url = 去上面的链接找自己的推送接口
+url = XXXXXXXXXXXXXXXXXXXXXXXXX
 baidu_sitemap = os.path.join(sys.path[0], 'public', 'baidusitemap.xml')
 google_sitemap = os.path.join(sys.path[0], 'public', 'sitemap.xml')
 sitemap = [baidu_sitemap, google_sitemap]

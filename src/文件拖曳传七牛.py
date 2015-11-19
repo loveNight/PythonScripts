@@ -3,7 +3,7 @@
 # @Author: LoveNight
 # @Date:   2015-11-16 18:17:17
 # @Last Modified by:   LoveNight
-# @Last Modified time: 2015-11-18 17:34:12
+# @Last Modified time: 2015-11-19 15:30:28
 
 import qiniu
 import urllib
@@ -11,6 +11,8 @@ import sys
 import os
 import msvcrt
 import datetime
+import subprocess
+
 
 __author__ = "loveNight"
 
@@ -22,18 +24,19 @@ __author__ = "loveNight"
 """
 
 # ----------------手动配置区---------------
-accessKey = 自己填
-secretkey = 自己填
+accessKey = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+secretkey = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 # 上传空间的域名，需要自己去后台获取
 bucket_url = {
-    自己填: 自己填,
+    XXXXXXX: rXXXXXXXXXXXXXXXXXXXXXXXXXXX,
+    XXXXXXXXXX: XXXXXXXXXXXXXXXXXXXXXXX
 }
-bucket = 自己填  # 上传空间
+bucket = XXXXXXX  # 上传空间
 
 # ----------------默认配置区-------------------------
 img_suffix = ["jpg", "jpeg", "png", "bmp", "gif"]
-os.chdir(sys.path[0])
 result_file = "上传结果.txt"  # 保存上传结果
+result_file = os.path.join(sys.path[0], result_file)
 
 if os.path.exists(result_file):
     os.remove(result_file)
@@ -89,7 +92,11 @@ def save(filename, url):
 
 
 def getTimeStr():
-    """返回 2015/11/18/17/16/8/ 形式的字符串"""
+    """返回 2015/11/18/17/16/8/ 形式的字符串
+
+    如果上传同名文件且前缀相同，则后上传的文件会顶掉先前的
+    加时间作为前缀，即便于检索，又避免此问题
+    """
     now = datetime.datetime.now()
     tmp = tuple(now.timetuple())[:-3]
     tmp = map(str, tmp)
@@ -118,5 +125,4 @@ if __name__ == '__main__':
             ret, info, url = q.upload_file(bucket, up_filename, file)
             print("已上传： %s " % name)
             save(name, url)
-    print("\n上传结果保存在同目录下的 %s 文件中\n按任意键结束：" % result_file)
-    msvcrt.getch()
+    subprocess.call(result_file, shell=True)  # 打开文件

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Author: LostInNight
+# @Author: LoveNight
 # @Date:   2015-11-10 10:07:05
-# @Last Modified by:   LostInNight
-# @Last Modified time: 2015-11-19 15:02:45
+# @Last Modified by:   LoveNight
+# @Last Modified time: 2015-11-19 15:23:41
 
 import requests
 import time
@@ -18,8 +18,6 @@ from bs4 import BeautifulSoup as BS
 class ZhiHuClient(object):
 
     """连接知乎的工具类，维护一个Session
-
-    连接过程中会自动打开验证码黑图片
     2015.11.11
     """
 
@@ -60,7 +58,6 @@ class ZhiHuClient(object):
         """
         验证码错误返回：
         {'errcode': 1991829, 'r': 1, 'data': {'captcha': '请提交正确的验证码 :('}, 'msg': '请提交正确的验证码 :('}
-
         登录成功返回：
         {'r': 0, 'msg': '登陆成功'}
         """
@@ -75,7 +72,7 @@ class ZhiHuClient(object):
                 output.write(captcha)
             # 人眼识别
             print("=" * 50)
-            print("已为您打开验证码图片，请识别！")
+            print("已打开验证码图片，请识别！" % self.captchaFile)
             subprocess.call(self.captchaFile, shell=True)
             captcha = input("请输入验证码：")
             # 发送POST请求
@@ -132,5 +129,7 @@ class ZhiHuClient(object):
 
 
 if __name__ == '__main__':
+    username = "xxx"
+    password = "xxx"
     client = ZhiHuClient(username, password)
     print(client.open(r"http://www.zhihu.com/").text)

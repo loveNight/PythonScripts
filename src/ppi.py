@@ -3,9 +3,9 @@
 # @Author: LostInNight
 # @Date:   2015-10-27 14:31:20
 # @Last Modified by:   LostInNight
-# @Last Modified time: 2015-11-11 09:04:36
+# @Last Modified time: 2015-11-19 15:17:51
 
-# 本脚本用于切换公司后台登陆账号
+# 本脚本用于切换XXXX登陆账号
 
 from selenium import webdriver
 import os
@@ -21,7 +21,7 @@ def main(username, password):
     browser.set_page_load_timeout(30)
     browser.set_script_timeout(30)
 
-    browser.get(r'http://公司网站')
+    browser.get(r'http://XXXXXXXXXX.com')
 
     text_username = browser.find_element_by_name('username')
     text_password = browser.find_element_by_name('password')
@@ -47,12 +47,12 @@ if __name__ == '__main__':
     if not user_type:
         print('输入错误，程序结束！')
         exit(1)
-    if user_type == '账号1':
-        file = r'd:需要和账号1同时打开的文件'
+    if user_type == '账号':
+        file = r'd:\要同时打开的文件.xlsm'
         threading.Thread(
             target=lambda file: os.system(file), args=(file,)).start()
-        browser = main('账号1', '密码1')
-    elif user_type == 'wdn':
-        main('账号2', '密码2')
-    elif user_type in ['账号3', '账号3的别名']:
-        main('账号3', '密码3')
+        browser = main('账号', '密码')
+    elif user_type == '账号':
+        main('账号', '密码')
+    elif user_type in ['账号', '账号']:
+        main('账号', '密码')
