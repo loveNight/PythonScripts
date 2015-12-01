@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: LoveNight
-# @Date:   2015-11-10 10:07:05
+# @Date:   2015-12-01 15:54:22
 # @Last Modified by:   LoveNight
-# @Last Modified time: 2015-11-19 15:23:41
-
+# @Last Modified time: 2015-12-01 16:13:38
 import requests
 import time
 import json
@@ -38,11 +37,9 @@ class ZhiHuClient(object):
     captchaFile = os.path.join(sys.path[0], "captcha.gif")
     cookieFile = os.path.join(sys.path[0], "cookie")
 
-    def __init__(self, username, password):
+    def __init__(self):
         os.chdir(sys.path[0])  # 设置脚本所在目录为当前工作目录
-        self.__username = username
-        self.__password = password
-        self.__loginURL = self.loginURL.format(self.__getUsernameType())
+
         self.__session = requests.Session()
         self.__session.headers = self.headers  # 用self调用类变量是防止将来类改名
         # 若已经有 cookie 则直接登录
@@ -51,16 +48,19 @@ class ZhiHuClient(object):
             print("检测到cookie文件，直接使用cookie登录")
             self.__session.cookies.update(self.__cookie)
         else:
-            self.__login()
+            print("没有找到cookie文件，请调用login方法登录一次！")
 
     # 登录
-    def __login(self):
+    def login(self, username, password):
         """
         验证码错误返回：
         {'errcode': 1991829, 'r': 1, 'data': {'captcha': '请提交正确的验证码 :('}, 'msg': '请提交正确的验证码 :('}
         登录成功返回：
         {'r': 0, 'msg': '登陆成功'}
         """
+        self.__username = username
+        self.__password = password
+        self.__loginURL = self.loginURL.format(self.__getUsernameType())
         # 随便开个网页，获取登陆所需的_xsrf
         html = self.open(self.homeURL).text
         soup = BS(html, "lxml")  # 需要第三方库lxml，也可以用标准库中的html.parser
@@ -72,7 +72,7 @@ class ZhiHuClient(object):
                 output.write(captcha)
             # 人眼识别
             print("=" * 50)
-            print("已打开验证码图片，请识别！" % self.captchaFile)
+            print("已打开验证码图片，请识别！")
             subprocess.call(self.captchaFile, shell=True)
             captcha = input("请输入验证码：")
             # 发送POST请求
@@ -129,7 +129,8 @@ class ZhiHuClient(object):
 
 
 if __name__ == '__main__':
-    username = "xxx"
-    password = "xxx"
-    client = ZhiHuClient(username, password)
+    client = ZhiHuClient()
+    # 第一次使用时需要调用此方法登录一次，生成cookie文件
+    # 以后可以跳过这一步
+    # client.login(username, password)
     print(client.open(r"http://www.zhihu.com/").text)
