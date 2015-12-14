@@ -3,7 +3,7 @@
 # @Author: LoveNight
 # @Date:   2015-12-01 15:54:22
 # @Last Modified by:   LoveNight
-# @Last Modified time: 2015-12-01 16:13:38
+# @Last Modified time: 2015-12-14 17:42:04
 import requests
 import time
 import json
@@ -75,12 +75,13 @@ class ZhiHuClient(object):
             print("已打开验证码图片，请识别！")
             subprocess.call(self.captchaFile, shell=True)
             captcha = input("请输入验证码：")
+            os.remove(self.captchaFile)
             # 发送POST请求
             data = {
                 "_xsrf": _xsrf,
                 "password": self.__password,
                 "remember_me": "true",
-                "phone_num": self.__username,
+                self.__getUsernameType(): self.__username,
                 "captcha": captcha
             }
             res = self.__session.post(self.__loginURL, data=data)
